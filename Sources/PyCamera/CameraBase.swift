@@ -2,13 +2,16 @@
 import Foundation
 import CoreImage
 import PyCoreVideo
-import PythonSwiftCore
+import PySwiftCore
+import PythonCore
+
+extension CVBuffer: @unchecked Sendable {}
 
 public class CameraBase {
     
     let camera = CameraBackend()
 
-    var py_callback: CameraBasePyCallback?
+    public var py_callback: PyCallback?
 
     private var previewBufferSize: Int = 0
     
@@ -18,6 +21,7 @@ public class CameraBase {
         }
     }
     
+	
     func handleCameraPreviews() async {
         let pixelStream = camera.previewStream
         for await pixels in pixelStream {
@@ -67,6 +71,9 @@ extension CameraBase: CameraBase_PyProtocol {
         camera.stop()
     }
     
+	public func set_callback(callback: PyPointer) {
+		py_callback = .init(callback: callback)
+	}
     
 }
 

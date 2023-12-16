@@ -1,4 +1,4 @@
-from swift_types import *
+from swift_tools.swift_types import * # type: ignore
 
 "import AVFoundation"
 
@@ -6,10 +6,12 @@ from swift_types import *
 #     "AVFoundation"
 
 
-@wrapper
+@wrapper()
 class CameraBase:
 
+    def __init__(self): ...
 
+    def set_callback(self, callback: object): ...
     class Callbacks:
 
         def new_texture(self, w: int, h: int): ...
