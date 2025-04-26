@@ -5,7 +5,7 @@ import PyCoreVideo
 import PySwiftCore
 import PythonCore
 
-extension CVBuffer: @unchecked Sendable {}
+extension CVBuffer: @unchecked Swift.Sendable {}
 
 public class CameraBase {
     
