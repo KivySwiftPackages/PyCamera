@@ -35,7 +35,7 @@ let pyfile_package: Package.Dependency = if local {
 let package_deps: [Package.Dependency] = [
     pykit_package,
     pyvideo_package,
-    kivytex_package,
+    //kivytex_package,
     pyfile_package
 ]
 
@@ -55,7 +55,7 @@ let package = Package(
 			dependencies: [
                 .product(name: "SwiftonizeModules", package: "PySwiftKit"),
                 .product(name: "PyCoreVideo", package: "PyCoreVideo"),
-                "KivyTexture"
+                //"KivyTexture"
 			]//,
 			//plugins: [ .plugin(name: "Swiftonize", package: "SwiftonizePlugin") ]
 		),
