@@ -12,7 +12,7 @@ class CameraBackend: NSObject {
     private var sessionQueue: DispatchQueue!
     
     private var allCaptureDevices: [AVCaptureDevice] {
-        AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInTrueDepthCamera, .builtInDualCamera, .builtInDualWideCamera, .builtInWideAngleCamera, .builtInDualWideCamera], mediaType: .video, position: .unspecified).devices
+        AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInDualCamera, .builtInDualWideCamera, .builtInWideAngleCamera, .builtInDualWideCamera, .builtInTripleCamera], mediaType: .video, position: .unspecified).devices
     }
     
     private var frontCaptureDevices: [AVCaptureDevice] {
@@ -130,7 +130,7 @@ class CameraBackend: NSObject {
         
         let photoOutput = AVCapturePhotoOutput()
                         
-        captureSession.sessionPreset = .photo
+        captureSession.sessionPreset = .hd1920x1080
 
         let videoOutput = AVCaptureVideoDataOutput()
         videoOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: "VideoDataOutputQueue"))
@@ -251,6 +251,8 @@ class CameraBackend: NSObject {
                 self.captureSession.startRunning()
             }
         }
+        
+        
     }
     
     func stop() {
@@ -342,6 +344,7 @@ extension CameraBackend: AVCapturePhotoCaptureDelegate {
 extension CameraBackend: AVCaptureVideoDataOutputSampleBufferDelegate {
     
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
+        
         guard let pixelBuffer = sampleBuffer.imageBuffer else { return }
         
         if connection.isVideoOrientationSupported,
