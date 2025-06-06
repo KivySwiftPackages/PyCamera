@@ -6,9 +6,9 @@ import PackageDescription
 let local = false
 
 let pykit_package: Package.Dependency = if local {
-    .package(path: "/Users/codebuilder/Documents/GitHub/PySwiftKit")
+    .package(path: "../PySwiftKit")
 } else {
-    .package(url: "https://github.com/KivySwiftLink/PySwiftKit", from: .init(311, 0, 0))
+    .package(url: "https://github.com/kv-swift/PySwiftKit", from: .init(311, 0, 0))
 }
 
 let pyvideo_package: Package.Dependency =
@@ -28,7 +28,7 @@ let kivytex_package: Package.Dependency =
 let pyfile_package: Package.Dependency = if local {
     .package(path: "../PyFileGenerator")
 } else {
-    .package(url: "https://github.com/PythonSwiftLink/PyFileGenerator", from: .init(0, 0, 1))
+    .package(url: "https://github.com/py-swift/PyFileGenerator", from: .init(0, 0, 1))
 }
 
 
