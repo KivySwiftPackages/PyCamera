@@ -52,7 +52,7 @@ public class CameraBase {
     }
     
     @PyMethod
-    func abc(a: PyPointer?, b: CameraCallback?, c: [Int], d: Int32, e: Double, f: String?) {
+    static func abc(a: PyPointer?, b: CameraCallback?, c: [Int], d: Int32, e: Double, f: String?) {
         print("abc")
     }
 
@@ -109,6 +109,7 @@ extension CameraBase {
 
 @PyClass
 @PyContainer
+@dynamicMemberLookup
 final class CameraCallback: PySerialize {
     
     @PyCall
@@ -120,7 +121,6 @@ final class CameraCallback: PySerialize {
     var pyPointer: PyPointer {
         py_target.newRef
     }
-    
 }
     
 

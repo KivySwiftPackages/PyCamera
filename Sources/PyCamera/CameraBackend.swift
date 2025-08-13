@@ -1,6 +1,10 @@
 import AVFoundation
 import CoreImage
+#if os(iOS)
 import UIKit
+#else
+import Cocoa
+#endif
 import os.log
 
 class CameraBackend: NSObject {
@@ -12,7 +16,18 @@ class CameraBackend: NSObject {
     private var sessionQueue: DispatchQueue!
     
     private var allCaptureDevices: [AVCaptureDevice] {
+        
+#if os(iOS)
         AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInDualCamera, .builtInDualWideCamera, .builtInWideAngleCamera, .builtInDualWideCamera, .builtInTripleCamera], mediaType: .video, position: .unspecified).devices
+        #else
+        AVCaptureDevice.DiscoverySession(
+            deviceTypes: [
+                .externalUnknown
+            ],
+            mediaType: .video,
+            position: .unspecified
+        ).devices
+        #endif
     }
     
     private var frontCaptureDevices: [AVCaptureDevice] {
@@ -104,9 +119,11 @@ class CameraBackend: NSObject {
         sessionQueue = DispatchQueue(label: "session queue")
         
         captureDevice = availableCaptureDevices.first ?? AVCaptureDevice.default(for: .video)
-        
+#if os(iOS)
         UIDevice.current.beginGeneratingDeviceOrientationNotifications()
+        
         NotificationCenter.default.addObserver(self, selector: #selector(updateForDeviceOrientation), name: UIDevice.orientationDidChangeNotification, object: nil)
+#endif
     }
     
     private func configureCaptureSession(completionHandler: (_ success: Bool) -> Void) {
@@ -157,7 +174,9 @@ class CameraBackend: NSObject {
         self.videoOutput = videoOutput
         
         photoOutput.isHighResolutionCaptureEnabled = true
+#if os(iOS)
         photoOutput.maxPhotoQualityPrioritization = .quality
+        #endif
         
         updateVideoOutputConnection()
         
@@ -273,7 +292,7 @@ class CameraBackend: NSObject {
             self.captureDevice = AVCaptureDevice.default(for: .video)
         }
     }
-
+#if os(iOS)
     private var deviceOrientation: UIDeviceOrientation {
         var orientation = UIDevice.current.orientation
         if orientation == UIDeviceOrientation.unknown {
@@ -281,12 +300,12 @@ class CameraBackend: NSObject {
         }
         return orientation
     }
-    
+    #endif
     @objc
     func updateForDeviceOrientation() {
         //TODO: Figure out if we need this for anything.
     }
-    
+#if os(iOS)
     private func videoOrientationFor(_ deviceOrientation: UIDeviceOrientation) -> AVCaptureVideoOrientation? {
         switch deviceOrientation {
         case .portrait: return AVCaptureVideoOrientation.portrait
@@ -296,7 +315,7 @@ class CameraBackend: NSObject {
         default: return nil
         }
     }
-    
+    #endif
     func takePhoto() {
         guard let photoOutput = self.photoOutput else { return }
         
@@ -309,18 +328,23 @@ class CameraBackend: NSObject {
             }
             
             let isFlashAvailable = self.deviceInput?.device.isFlashAvailable ?? false
-            photoSettings.flashMode = isFlashAvailable ? .auto : .off
             photoSettings.isHighResolutionPhotoEnabled = true
+#if os(iOS)
+            photoSettings.flashMode = isFlashAvailable ? .auto : .off
+            
+           
             if let previewPhotoPixelFormatType = photoSettings.availablePreviewPhotoPixelFormatTypes.first {
                 photoSettings.previewPhotoFormat = [kCVPixelBufferPixelFormatTypeKey as String: previewPhotoPixelFormatType]
             }
             photoSettings.photoQualityPrioritization = .balanced
-            
+#endif
             if let photoOutputVideoConnection = photoOutput.connection(with: .video) {
+#if os(iOS)
                 if photoOutputVideoConnection.isVideoOrientationSupported,
                     let videoOrientation = self.videoOrientationFor(self.deviceOrientation) {
                     photoOutputVideoConnection.videoOrientation = videoOrientation
                 }
+                #endif
             }
             
             photoOutput.capturePhoto(with: photoSettings, delegate: self)
@@ -346,17 +370,17 @@ extension CameraBackend: AVCaptureVideoDataOutputSampleBufferDelegate {
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         
         guard let pixelBuffer = sampleBuffer.imageBuffer else { return }
-        
+#if os(iOS)
         if connection.isVideoOrientationSupported,
            let videoOrientation = videoOrientationFor(deviceOrientation) {
             connection.videoOrientation = videoOrientation
         }
-
+        #endif
         //addToPreviewStream?(CIImage(cvPixelBuffer: pixelBuffer))
         addToPreviewStream?(pixelBuffer)
     }
 }
-
+#if os(iOS)
 fileprivate extension UIScreen {
 
     var orientation: UIDeviceOrientation {
@@ -374,6 +398,6 @@ fileprivate extension UIScreen {
         }
     }
 }
-
+#endif
 //fileprivate let logger = Logger(subsystem: "com.apple.swiftplaygroundscontent.capturingphotos", category: "Camera")
 

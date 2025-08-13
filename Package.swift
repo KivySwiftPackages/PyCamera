@@ -8,7 +8,7 @@ let local = false
 let pykit_package: Package.Dependency = if local {
     .package(path: "../PySwiftKit")
 } else {
-    .package(url: "https://github.com/kv-swift/PySwiftKit", from: .init(311, 0, 0))
+    .package(url: "https://github.com/py-swift/PySwiftKit", from: .init(311, 0, 0))
 }
 
 let pyvideo_package: Package.Dependency =
@@ -42,7 +42,7 @@ let package_deps: [Package.Dependency] = [
 
 let package = Package(
 	name: "PyCamera",
-	platforms: [.iOS(.v13)],
+    platforms: [.iOS(.v13), .macOS(.v11)],
 	products: [
 		.library(name: "PyCamera", targets: ["PyCamera"])
 	],
